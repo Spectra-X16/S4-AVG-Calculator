@@ -2,7 +2,7 @@ import streamlit as st
 
 st.set_page_config(page_title="S4 Average Calculator", page_icon="🎓")
 
-st.title("🎓 Fourth Semester Average Calculator — Automation Field")
+st.title("🎓 S4 Average Calculator — Automation Field")
 
 # 1. Get the User's Name
 name = st.text_input("Please Write Your Name:", placeholder="e.g. Mohammed")
