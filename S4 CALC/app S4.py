@@ -92,7 +92,7 @@ if st.button("Calculate My Average", type="primary"):
 
     st.divider()
     if final_avg >= 10:
-        st.balloons()
+        
         st.success(f"### Average: {final_avg} / 20\nGood Job **{name}**, You Passed! 🎉")
     else:
         st.error(f"### Average: {final_avg} / 20\nGood Luck Next Time **{name}**. 💪")
