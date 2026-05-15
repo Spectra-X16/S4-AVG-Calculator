@@ -90,7 +90,7 @@ mesures,   mesures_f   = exam_tp("Mesures électriques & électroniques")
 
 TOTAL_COEFF = 17  # 1+1+2+1+3+1+3+2+2+2 = 18... wait: arch(1)+secu(1)+logique(2)+tp_logique(1)+asservis(3)+tp_asservis(1)+numerique(3)+signal(2)+tec(2)+mesures(2) = 18
 # Correction: 1+1+2+1+3+1+3+2+2+2 = 18
-TOTAL_COEFF = 17
+TOTAL_COEFF = 18
 
 if st.button("Calculate My Average", type="primary"):
 
@@ -103,7 +103,7 @@ if st.button("Calculate My Average", type="primary"):
         ("TP Systèmes asservis",                    tp_asservis, 1, tp_asservis_f),
         ("Méthodes Numériques",                     numerique,   3, numerique_f),
         ("Théorie du Signal",                       signal,      2, signal_f),
-        ("Techniques Expression & Com.",            tec,         1, tec_f),
+        ("Techniques Expression & Com.",            tec,         2, tec_f),
         ("Mesures électriques & élec.",             mesures,     2, mesures_f),
     ]
 
