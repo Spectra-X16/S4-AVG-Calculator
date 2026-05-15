@@ -41,6 +41,18 @@ def exam_tp(label):
     formula = f"Exam ({exam}) × 0.6  +  TP ({tp}) × 0.4 = **{round(score, 2)}**"
     return score, formula
 
+def exam_td_tp(label):
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        exam = st.number_input(f"{label} (Exam)", min_value=0.0, max_value=20.0, value=10.0, step=0.25)
+    with col2:
+        td = st.number_input(f"{label} (TD)", min_value=0.0, max_value=20.0, value=10.0, step=0.25)
+    with col3:
+        tp = st.number_input(f"{label} (TP)", min_value=0.0, max_value=20.0, value=10.0, step=0.25)
+    score = exam * 0.6 + td * 0.2 + tp * 0.2
+    formula = f"Exam ({exam}) × 0.6  +  TD ({td}) × 0.2  +  TP ({tp}) × 0.2 = **{round(score, 2)}**"
+    return score, formula
+
 # ── Subjects ──────────────────────────────────────────────────────────────────
 
 st.subheader("📘 Modules")
@@ -63,7 +75,7 @@ tp_asservis, tp_asservis_f = tp_only("TP Systèmes asservis linéaires & continu
 st.divider()
 
 # Méthodes Numériques — Exam + TD + TP (coeff 3)
-numerique, numerique_f = exam_tp("Méthodes Numériques")
+numerique, numerique_f = exam_td_tp("Méthodes Numériques")
 st.divider()
 
 # Coeff 2 — Exam + TD
