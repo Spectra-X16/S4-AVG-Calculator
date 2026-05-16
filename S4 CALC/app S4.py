@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 st.set_page_config(page_title="S4 Average Calculator", page_icon="🎓")
 
@@ -57,39 +58,31 @@ def exam_td_tp(label):
 
 st.subheader("📘 Modules")
 
-# Coeff 1 — Exam only
-arch,      arch_f      = exam_only("Architecture systèmes automatisés")
-secu,      secu_f      = exam_only("Sécurité électrique")
+arch,        arch_f        = exam_only("Architecture systèmes automatisés")
+secu,        secu_f        = exam_only("Sécurité électrique")
 st.divider()
 
-# Logique — Exam + TD only (coeff 2) + separate TP (coeff 1)
 st.markdown("**Logique combinatoire & séquentielle**")
-logique,   logique_f   = exam_td("Logique combinatoire & séquentielle")
-tp_logique, tp_logique_f = tp_only("TP Logique combinatoire & séquentielle")
+logique,     logique_f     = exam_td("Logique combinatoire & séquentielle")
+tp_logique,  tp_logique_f  = tp_only("TP Logique combinatoire & séquentielle")
 st.divider()
 
-# Asservis — Exam + TD only (coeff 3) + separate TP (coeff 1)
 st.markdown("**Systèmes asservis linéaires & continus**")
-asservis,  asservis_f  = exam_td("Systèmes asservis linéaires & continus")
+asservis,    asservis_f    = exam_td("Systèmes asservis linéaires & continus")
 tp_asservis, tp_asservis_f = tp_only("TP Systèmes asservis linéaires & continus")
 st.divider()
 
-# Méthodes Numériques — Exam + TD + TP (coeff 3)
-numerique, numerique_f = exam_td_tp("Méthodes Numériques")
+numerique,   numerique_f   = exam_td_tp("Méthodes Numériques")
 st.divider()
 
-# Coeff 2 — Exam + TD
-signal,    signal_f    = exam_td("Théorie du Signal")
-tec,       tec_f       = exam_td("Techniques d'Expression & Communication")
+signal,      signal_f      = exam_td("Théorie du Signal")
+tec,         tec_f         = exam_td("Techniques d'Expression & Communication")
 st.divider()
 
-# Coeff 2 — Exam + TP
-mesures,   mesures_f   = exam_tp("Mesures électriques & électroniques")
+mesures,     mesures_f     = exam_tp("Mesures électriques & électroniques")
 
 # ── Calculation ───────────────────────────────────────────────────────────────
 
-TOTAL_COEFF = 17  # 1+1+2+1+3+1+3+2+2+2 = 18... wait: arch(1)+secu(1)+logique(2)+tp_logique(1)+asservis(3)+tp_asservis(1)+numerique(3)+signal(2)+tec(2)+mesures(2) = 18
-# Correction: 1+1+2+1+3+1+3+2+2+2 = 18
 TOTAL_COEFF = 18
 
 if st.button("Calculate My Average", type="primary"):
@@ -124,20 +117,35 @@ if st.button("Calculate My Average", type="primary"):
 
     st.divider()
 
-    # ── Full calculation breakdown ────────────────────────────────────────────
+    # ── Full calculation breakdown table ──────────────────────────────────────
     st.subheader("🧮 Full Calculation Breakdown")
 
-    contributions = "  +  ".join(
-        [f"({round(score, 2)} × {coeff})" for _, score, coeff, _ in modules]
-    )
+    rows = []
+    for mod_name, score, coeff, _ in modules:
+        weighted = round(score * coeff, 2)
+        status   = "✅" if score >= 10 else "❌"
+        rows.append({
+            "Status": status,
+            "Module": mod_name,
+            "Score /20": round(score, 2),
+            "Coeff": coeff,
+            "Score × Coeff": weighted,
+        })
+
+    # Totals row
+    rows.append({
+        "Status": "",
+        "Module": "TOTAL",
+        "Score /20": "",
+        "Coeff": TOTAL_COEFF,
+        "Score × Coeff": round(weighted_sum, 2),
+    })
+
+    df = pd.DataFrame(rows)
+    st.dataframe(df, use_container_width=True, hide_index=True)
+
     st.markdown(f"""
-**Step 1 — Weighted sum of all modules:**
-
-{contributions} = **{round(weighted_sum, 2)}**
-
----
-
-**Step 2 — Divide by total coefficients ({TOTAL_COEFF}):**
+**Final Average = Total (Score × Coeff) ÷ Total Coeff**
 
 {round(weighted_sum, 2)} ÷ {TOTAL_COEFF} = **{final_avg} / 20**
 """)
@@ -146,6 +154,7 @@ if st.button("Calculate My Average", type="primary"):
 
     # ── Final result ──────────────────────────────────────────────────────────
     if final_avg >= 10:
+        st.balloons()
         st.success(f"### 🎉 Final Average: {final_avg} / 20\nGood Job **{name}**, You Passed!")
     else:
         st.error(f"### Final Average: {final_avg} / 20\nGood Luck Next Time **{name}**. 💪")
