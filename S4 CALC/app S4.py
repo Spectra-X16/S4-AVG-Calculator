@@ -58,8 +58,26 @@ def exam_td_tp(label):
 
 st.subheader("📘 Modules")
 
-arch,        arch_f        = exam_only("Architecture systèmes automatisés")
-secu,        secu_f        = exam_only("Sécurité électrique")
+arch, arch_f = exam_only("Architecture systèmes automatisés")
+st.divider()
+
+# ── Sécurité électrique — optional ───────────────────────────────────────────
+st.info("⚠️ **Note:** It is unclear whether **Sécurité électrique** is included in your S4 average calculation. Please check with your department before calculating.")
+
+include_secu = st.radio(
+    "Include Sécurité électrique in the calculation?",
+    options=["Yes, include it (Coeff 1)", "No, exclude it"],
+    index=0,
+    horizontal=True,
+)
+
+if include_secu.startswith("Yes"):
+    secu, secu_f = exam_only("Sécurité électrique")
+    secu_coeff = 1
+else:
+    secu, secu_f, secu_coeff = None, None, 0
+    st.caption("Sécurité électrique will be excluded from the calculation.")
+
 st.divider()
 
 st.markdown("**Logique combinatoire & séquentielle**")
@@ -83,22 +101,26 @@ mesures,     mesures_f     = exam_tp("Mesures électriques & électroniques")
 
 # ── Calculation ───────────────────────────────────────────────────────────────
 
-TOTAL_COEFF = 18
+BASE_COEFF   = 17  # without Sécurité électrique
+TOTAL_COEFF  = BASE_COEFF + secu_coeff
 
 if st.button("Calculate My Average", type="primary"):
 
     modules = [
-        ("Architecture systèmes automatisés",       arch,        1, arch_f),
-        ("Sécurité électrique",                     secu,        1, secu_f),
-        ("Logique combinatoire & séquentielle",     logique,     2, logique_f),
-        ("TP Logique combinatoire & séquentielle",  tp_logique,  1, tp_logique_f),
-        ("Systèmes asservis linéaires & continus",  asservis,    3, asservis_f),
-        ("TP Systèmes asservis",                    tp_asservis, 1, tp_asservis_f),
-        ("Méthodes Numériques",                     numerique,   3, numerique_f),
-        ("Théorie du Signal",                       signal,      2, signal_f),
-        ("Techniques Expression & Com.",            tec,         2, tec_f),
-        ("Mesures électriques & élec.",             mesures,     2, mesures_f),
+        ("Architecture systèmes automatisés",       arch,        1,          arch_f),
+        ("Logique combinatoire & séquentielle",     logique,     2,          logique_f),
+        ("TP Logique combinatoire & séquentielle",  tp_logique,  1,          tp_logique_f),
+        ("Systèmes asservis linéaires & continus",  asservis,    3,          asservis_f),
+        ("TP Systèmes asservis",                    tp_asservis, 1,          tp_asservis_f),
+        ("Méthodes Numériques",                     numerique,   3,          numerique_f),
+        ("Théorie du Signal",                       signal,      2,          signal_f),
+        ("Techniques Expression & Com.",            tec,         2,          tec_f),
+        ("Mesures électriques & élec.",             mesures,     2,          mesures_f),
     ]
+
+    # Insert Sécurité électrique at position 1 if included
+    if include_secu.startswith("Yes"):
+        modules.insert(1, ("Sécurité électrique", secu, 1, secu_f))
 
     weighted_sum = sum(score * coeff for _, score, coeff, _ in modules)
     final_avg    = round(weighted_sum / TOTAL_COEFF, 2)
@@ -120,24 +142,27 @@ if st.button("Calculate My Average", type="primary"):
     # ── Full calculation breakdown table ──────────────────────────────────────
     st.subheader("🧮 Full Calculation Breakdown")
 
+    if not include_secu.startswith("Yes"):
+        st.caption("⚠️ Sécurité électrique was excluded from this calculation.")
+
     rows = []
     for mod_name, score, coeff, _ in modules:
         weighted = round(score * coeff, 2)
         status   = "✅" if score >= 10 else "❌"
         rows.append({
-            "Status": status,
-            "Module": mod_name,
-            "Score /20": round(score, 2),
-            "Coeff": coeff,
+            "Status":        status,
+            "Module":        mod_name,
+            "Score /20":     round(score, 2),
+            "Coeff":         coeff,
             "Score × Coeff": weighted,
         })
 
     # Totals row
     rows.append({
-        "Status": "",
-        "Module": "TOTAL",
-        "Score /20": "",
-        "Coeff": TOTAL_COEFF,
+        "Status":        "",
+        "Module":        "TOTAL",
+        "Score /20":     "",
+        "Coeff":         TOTAL_COEFF,
         "Score × Coeff": round(weighted_sum, 2),
     })
 
@@ -154,6 +179,7 @@ if st.button("Calculate My Average", type="primary"):
 
     # ── Final result ──────────────────────────────────────────────────────────
     if final_avg >= 10:
+        st.balloons()
         st.success(f"### 🎉 Final Average: {final_avg} / 20\nGood Job **{name}**, You Passed!")
     else:
         st.error(f"### Final Average: {final_avg} / 20\nGood Luck Next Time **{name}**. 💪")
