@@ -179,7 +179,6 @@ if st.button("Calculate My Average", type="primary"):
 
     # ── Final result ──────────────────────────────────────────────────────────
     if final_avg >= 10:
-        st.balloons()
         st.success(f"### 🎉 Final Average: {final_avg} / 20\nGood Job **{name}**, You Passed!")
     else:
         st.error(f"### Final Average: {final_avg} / 20\nGood Luck Next Time **{name}**. 💪")
